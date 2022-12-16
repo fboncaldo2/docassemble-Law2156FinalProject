@@ -1,0 +1,821 @@
+---
+include:
+  - docassemble.AssemblyLine:assembly_line.yml
+  - docassemble.ALMassachusetts:al_massachusetts.yml
+---
+metadata:
+  title: |
+    Law2156 Final Project
+  short title: |
+    Law2156 Final Project
+  tags:
+    - FA-00-00-00-00
+  authors:
+    - Francesco C. Boncaldo
+---
+mandatory: True
+comment: |
+  Global interview metadata
+variable name: interview_metadata["law2156_Final_Project"]
+data:
+  al_weaver_version: "1.8.0"
+  generated on: "2022-12-15"
+  title: >-
+    Law2156 Final Project
+  short title: >-
+    Law2156 Final Project
+  description: |-
+    Law2156 Final Project
+  allowed courts: 
+    - "Probate and Family Court"
+  categories:
+    - "FA-00-00-00-00"
+  typical role: "plaintiff"
+  generate download screen: True
+---
+code: |
+  interview_metadata['main_interview_key'] =  'law2156_Final_Project'
+---
+code: |
+  # This controls the default country and list of states in address field questions
+  AL_DEFAULT_COUNTRY = "US"
+---
+code: |
+  # This controls the default state in address field questions
+  AL_DEFAULT_STATE = "MA"
+---
+code: |
+  github_repo_name =  'docassemble-Law2156FinalProject'
+---
+code: |
+  interview_short_title = "LAW-2156 Final Project"
+---
+code: |
+  al_form_type = "other" 
+---
+objects:
+  - other_parties: ALPeopleList.using(ask_number=True,target_number=1)
+  - users: ALPeopleList.using(ask_number=True,target_number=1)
+---
+sections:
+  - review_law2156_Final_Project: Review your answers
+---
+#################### Interview order #####################
+comment: |
+  Controls order and branching logic for questions specific to this form
+id: interview_order_law2156_Final_Project
+code: |
+  # Set the allowed courts for this interview
+  allowed_courts = interview_metadata["law2156_Final_Project"]["allowed courts"]
+  nav.set_section("review_law2156_Final_Project")
+  if not primary_eligibility:
+    secondary_eligibility
+    if not secondary_eligibility:
+      kick_out_user
+  user_role = "plaintiff"
+  user_ask_role = "plaintiff"
+  LAW2156_Final_Project
+  users[0].affidavit
+  users.gather()
+  set_parts(subtitle=str(users))
+  users[0].address.address
+  other_parties.gather()
+  set_progress(14)
+  other_parties[0].address.address
+  users[0].previous_marriage_number
+  other_parties[0].previous_marriage_number
+  The_Marriage
+  users[0].place_of_marriage
+  set_progress(28)
+  users[0].place_last_lived
+  users[0].number_of_children_of_marriage
+  Financial_Information
+  users[0].employment_status
+  users[0].gross_annual_income
+  set_progress(42)
+  users[0].motor_vehicles_yes_no
+  Respondent_Employment_Information
+  other_parties[0].employement_status
+  Financial_Information__Marital_Assets
+  marital_real_property_yes_no_unsure
+  set_progress(56)
+  Divorce_in_Massachusetts
+  users[0].fault_divorce_grounds
+  users[0].breakdown_date
+  users[0].no_fault_a_or_b_divorce
+  users[0].grant_divorce
+  interview_order_law2156_Final_Project = True
+---
+###################### Main order ######################
+comment: |
+  This block includes the logic for standalone interviews.
+  Delete mandatory: True to include in another interview
+mandatory: True
+code: |
+  al_intro_screen
+  law2156_Final_Project_intro
+  interview_order_law2156_Final_Project
+  signature_date
+  # Store anonymous data for analytics / statistics
+  store_variables_snapshot(
+      persistent=True,
+      data={
+          "zip": showifdef("users[0].address.zip"),
+          "reached_interview_end": True,
+      },
+  )
+  law2156_Final_Project_download
+---
+comment: |
+  This question is used to introduce your interview. Please customize
+id: Law2156_Final_Project
+continue button field: law2156_Final_Project_intro
+question: |
+  Law2156 Final Project
+subquestion: |
+  Hello and Welcome! This interview is intended for individuals considering divorce in Massachusetss. This interview will ask you a series of questions and provide you a printable output form that contains a portion of the necessay information needed to file for divorce.
+  At the end of this interview please print the output form and follow the next step instructions. This interview should take about 25 minutes to compelte
+---
+id: LAW 2156 Final Project
+question: |
+  LAW-2156 Final Project
+subquestion: |
+  This interview will ask you personal questions about you, your spouse, your family and your marriage.
+      
+  Sources of where you can find the information needed to answer these questions include: 
+         
+         - A Certified Copy of you Marriage Certificate 
+         - Divers Licenses or Identification Cards
+         - Birth Certificates
+         
+  In order to fill out other Family and Probate Court Forms additionally required to file for divorce in Massachusetts please have access to your Social Security card and number. You will not need your Social Security card and number for this interview.
+continue button field: LAW2156_Final_Project
+---
+question: |
+  Eligibility Kickout Screen
+fields:
+  - Have you lived in Massachusetts for twelve consecutive months?: primary_eligibility
+    datatype: yesnoradio
+  - Did the reason for your divorce occur in Massachusetts and were you and your spouse living together as a married couple in Massachusetts at that time?: secondary_eligibility
+    datatype: yesnoradio
+    show if: 
+      variable: primary_eligibility
+      is: False
+---
+event: kick_out_user
+question: |
+  This is not the right interview for you
+subquestion: |
+  You can file for divorce in Massachusetts if you have lived in the state for one year, or if the reason the marriage ended happened in Massachusetts and you have lived in Massachusetts as a couple.
+button:
+  Restart: restart
+mandatory: True
+---
+id: Procedural Information
+question: |
+  Procedural Information
+subquestion: |
+  You, the person answering these interview questions, are called the "User." The user of this form is called the "Petitioner." You as the petitioner will be the spouse who files the complaint for divorce. 
+  
+  Your Spouse is the "Respondent"
+fields:
+  - "Petitioner Has Filed Previous Family Court Action Against Spouse": users[0].affidavit
+    datatype: dropdown
+    choices:
+      - Yes
+      - No
+  - "Today's Date": date
+    datatype: date
+---
+id: Petitioner Marital History Information
+question: |
+  Petitioner Marital History & Information
+subquestion: |
+  The following questions will ask you about your marriage history. 
+        
+  The first question asks you about the number of times you have been married.
+        
+  The second question asks you about children you are in custody of from outside of this marriage. You should include any minor, biological, adoptive, or depended children you are responsible for and have custody of.
+fields:
+  - "Number of Times Married": users[0].previous_marriage_number
+    datatype: integer
+    min: 0
+  - "Custody of Children of this Marriage": users[0].custody_of_children
+    datatype: interger
+    min: 0
+---
+id: Respondent Marital History Information
+question: |
+  Respondent Marital History & Information
+subquestion: |
+  The following questions will ask you about your spouse's marriage history. They are similar to the same questions asked about your marital history.
+  
+  The first question asks you about the number of times your spouse has been married.
+  
+  The second question asks you about children your spouse has custody of from outside of this marriage. You should include any minor, biological, adoptive, or depended children your spouse is responsible for and has custody of.
+fields:
+  - "Number of Times Married": other_parties[0].previous_marriage_number
+    datatype: integer
+    min: 0
+  - "Number of Minor Children in Custody of": other_parties[0].custody_children_number
+    datatype: integer
+    min: 0
+---
+id: The Marriage
+question: |
+  The Marriage
+subquestion: |
+  The following series of questions will ask for information regarding your current marriage.
+  
+  The first set of questions will ask you about the place where you and your spouse were married, and the date of that marriage. 
+        
+     - If you do not know this information, it can be found on a Certified Copy of your Marriage      Certificate (which is needed in order to file for divorce in Massachusetts).
+  
+  The second set of questions will ask you about the last place and date you lived with your spouse as a married couple.
+    
+     - Living together as a married couple means you and your spouse cohabited together as a married couple. 
+     - If you and your spouse separated from one another at some point before considering divorce, please put the date you and your spouse last lived in the same place together.
+continue button field: The_Marriage
+---
+id: Marriage Information Beginning of Marriage
+question: |
+  Marriage Information - Beginning of Marriage
+subquestion: |
+  The following questions will ask you about the place where you and your spouse were married and the date of that marriage.
+fields:
+  - "Place of Marriage": users[0].place_of_marriage
+  - "Date of this Marriage": users[0].date_of_marriage
+    datatype: date
+---
+id: Marriage Information End of Marriage
+question: |
+  Marriage Information - End of Marriage
+subquestion: |
+  The following questions will ask you for the address of the place you and your spouse last lived together as a married couple, and the date when you and your spouse lived together as a married couple.
+fields:
+  - "Place You and Your Spouse Last Lived Together as a Married Couple": users[0].place_last_lived
+  - "Date You and Your Spouse Last Lived Together as a Married Couple": users[0].date_last_lived
+    datatype: date
+---
+id: Marriage Information Children of the Marriage
+question: |
+  Marriage Information - Children of the Marriage
+subquestion: |
+  Please indicate the total number of minor, dependent, adoptive or biological children you and your spouse have of this marriage.
+    
+  Please note that couples with children under 18 must also have to fill out two additional forms.
+    
+  The printable output form contains line where you can write the name and date of birth for the children of this marriage.
+fields:
+  - "Number of Children of this Marriage": users[0].number_of_children_of_marriage
+    datatype: integer
+    min: 0
+---
+id: Financial Information
+question: |
+  Financial Information
+subquestion: |
+  The following series of questions pertain to your personal assets and finances. Your finances are an important aspect of divorce in Massachusetts and, as part of your divorce, you will need to file a financial statement with the Court.
+   
+  If you are unsure or unable to answer to the questions, please select "Unsure" as your response.
+  
+  If you select "Unsure" as a response to any of the questions do not worry as your family law attorney should be able to help you clear any confusion and find the answers you need.
+continue button field: Financial_Information
+---
+id: Financial Information Employment
+question: |
+  Financial Information - Employment
+subquestion: |
+  The first series of questions will ask about your current employment status, and if you are self-employed and/or are a business owner.
+fields:
+  - "Employment Status": users[0].employment_status
+    input type: dropdown
+    choices:
+      - Employed
+      - Unemployed
+  - "Self-Employed or a Business Owner": users[0].self_employed_or_business_owner
+    input type: dropdown
+    choices:
+      - Self-Employed
+      - Business Owner
+      - Both
+      - N/A
+  - "Part-time Job": users[0].part_time_job
+    input type: dropdown
+    choices:
+      - Yes
+      - No
+---
+id: Financial Information Income Information
+question: |
+  Financial Information - Income Information
+subquestion: |
+  This second series of questions will ask you about your income and any assistance benefits you receive. 
+      
+    - You do not need to know the exact amount of income you make each year before taxes. Instead, you will need to know, or estimate, if you make above or below $75,000 a year before taxes. 
+    - In this section you will be asked if you receive assistance benefits, child support and/or alimony payments from pervious spouses. Please select "N/A" if the question criteria does not apply to you.
+fields:
+  - "Gross Annual Income": users[0].gross_annual_income
+    input type: dropdown
+    choices:
+      - Under $75,000
+      - Over $75,000
+  - "Recommended Financial Form": users[0].financial_form
+    required: False
+    input type: dropdown
+    choices:
+      - Short Form
+      - Long Form
+  - "Public Assistance": user_public_assistance
+    input type: dropdown
+    choices:
+      - Yes
+      - No
+  - "Alimony Income": users[0].income_alimony
+    input type: dropdown
+    choices:
+      - Yes
+      - No
+  - "Child Support Income": users[0].income_child_support
+    input type: dropdown
+    choices:
+      - Yes
+      - No
+  - "Rental Income": users[0].rental_income
+    input type: dropdown
+    choices:
+      - Yes
+      - No
+---
+id: Financial Information Asset Information
+question: |
+  Financial Information - Asset Information
+subquestion: |
+  This third and final series of questions in this section have to do with your personal assets and liabilities
+  
+    - You will be asked if you own any real property, rental property, interests in time shares, or motor vehicles individually.
+  
+  Individually means that the property is owned only by you, and not owned by you and your spouse together.
+fields:
+  - "Motor Vehicles": users[0].motor_vehicles_yes_no
+    datatype: dropdown
+    choices:
+      - Yes
+      - No
+  - "Real Estate or Real Property": users[0].real_property_yes_no_unsure
+    input type: dropdown
+    choices:
+      - Yes
+      - No
+      - Unsure
+  - "Rental Property": rental_property_yes_no_unsure
+    input type: dropdown
+    choices:
+      - Yes
+      - No
+      - Unsure
+  - "Debts": users[0].mortgage
+    datatype: dropdown
+    choices:
+      - Yes
+      - No
+---
+id: Respondent Employment Information
+question: |
+  Financial Information - Respondent Employment Information
+subquestion: |
+  The following set of questions will ask you about your spouse's employment information.
+  
+  You will only be asked about your spouse's employment status, and if they are self-employed and/or a business owner.
+continue button field: Respondent_Employment_Information
+---
+id: Financial Information Respondent Employment Information
+question: |
+  Financial Information - Respondent Employment Information
+fields:
+  - "Employment Status": other_parties[0].employement_status
+    input type: dropdown
+    choices:
+      - Employed
+      - Unemployed
+  - "Self-Employed or a Business Owner": other_parties[0].self_employed_or_business_owner
+    input type: dropdown
+    choices:
+      - Self-Employed
+      - Business Owner
+      - Both
+      - N/A
+---
+id: Financial Information Marital Assets
+question: |
+  Financial Information - Marital Assets
+subquestion: |
+  The following series of questions will ask you about your marital assets.
+  
+  Marital assets include any property that you and your spouse own together. You will be asked if you and your spouse own any real property together, including rental income producing property. Also, you will be asked if there are any joint bank accounts that both you and your spouse have access to.
+continue button field: Financial_Information__Marital_Assets
+---
+id: Financial Information Marital Assets
+question: |
+  Financial Information - Marital Assets
+fields:
+  - "Real Estate or Real Property": marital_real_property_yes_no_unsure
+    input type: dropdown
+    choices:
+      - Yes
+      - No
+      - Unsure
+  - "Joint Bank Accounts": spousal_joint_accounts_yes_no_unsure
+    input type: dropdown
+    choices:
+      - Yes
+      - No
+      - Unsure
+---
+id: Divorce in Massachusetts
+question: |
+  Divorce in Massachusetts
+subquestion: |
+  There are two categories of divorce in Massachusetts: Fault and No-Fault. 
+        
+    In a Fault Divorce, the person asking for the divorce must prove a specific reason for the divorce. The Fault Divorce process can take longer and be more expensive than a No-Fault divorce. The specific reasons and grounds are listed in M.G.L. c. 208, § 1, and are listed as follows:
+        
+           - Adultery
+           - Desertion
+           - Gross and confirmed habits of intoxication
+           - Cruel and abusive treatment
+           - Non-support
+           - Impotency
+           - A prison sentence of 5 or more years
+        
+    No-Fault Divorces in Massachusetts are broken up into two types of divorce: 1A and 1B.
+        
+    You should file for a 1A divorce when both you and your spouse agree that the marriage has irretrievably broken down and can’t continue and you and your spouse have reached a written agreement about child support, parenting time, alimony, child custody & dividing marital assets.
+        
+    You should file for a 1B divorce when you or your spouse believes the marriage has ended or both spouses believe the marriage has ended, but you and your spouse aren't in agreement about custody, support, or marital property issues. This is called a Contested No-Fault Divorce.
+        
+    The three types of divorce require different procedures and the process of determining what type of divorce is needed for your marriage can be difficult to navigate without the help of a family law attorney. 
+        
+    This form does not require you to know or select what type of divorce you want to file, but instead will ask questions about the reasons you feel like your marriage should end. Your responses will give your family law attorney the information necessary to make the important decision as to what type of divorce is best for you.
+continue button field: Divorce_in_Massachusetts
+---
+id: Fault Divorce Grounds
+question: |
+  Fault Divorce Grounds
+subquestion: |
+  As stated previously, a divorce option for Massachusetts married couples is a Fault Divorce. If applicable, please select the reason that you believe is the grounds for divorce. If none of the options below pertain to your divorce, please select "None of the Above," and continue on to the next section.
+fields:
+  - "Fault Divorce Grounds": users[0].fault_divorce_grounds
+    input type: dropdown
+    choices:
+      - Adultery
+      - Desertion
+      - Habits of intoxication
+      - Cruel and Abusive treatment
+      - Non-support
+      - Impotency
+      - A prison sentence of 5 or more years
+      - None of the Above
+    required: False
+---
+id: Irretrievable Breakdown of Marriage
+question: |
+  Irretrievable Breakdown of Marriage
+subquestion: |
+  An irretrievable breakdown of marriage occurs when one or both spouses are unable or unwilling to live together and there are no prospects for reconciliation. The breakdown can occur for a number of reasons which the petitioner will have to attempt to prove in order to have the Court grant a divorce.
+  
+  The date on which your marriage was irretrievably broken is required and necessary in order to file for divorce.
+fields:
+  - "Date of Irretrievable Breakdown of this Marriage": users[0].breakdown_date
+    datatype: date
+---
+id: No Fault Divorce Grounds
+question: |
+  No-Fault Divorce Grounds
+subquestion: |
+  The following questions are helpful in determining what type of No-Fault divorce could be right for you.
+  
+  Please note that if on the following question screen you selected one of the listed Fault Divorce grounds, it is likely that a Fault divorce is best for you. But even if you did select one of the Fault Divorce grounds, please answer both of the following questions. You may change the type of divorce you chose to file if you do not currently have a written separation agreement with your spouse but you think you and your spouse could come to terms on an agreement in the future.
+fields:
+  - "Do Both Spouses Agree to End this Marriage": users[0].no_fault_a_or_b_divorce
+    input type: dropdown
+    choices:
+      - Yes: "Yes"
+      - No: "Yes"
+  - "Existence of Written Separation Agreement": users[0].separation_agreement
+    datatype: yesnoradio
+    required: False
+    show if:
+      variable: users[0].no_fault_a_or_b_divorce
+      is: "Yes"
+---
+id: Petitioner Requests
+question: |
+  Petitioner Requests
+subquestion: |
+  As a part of the divorce process in Massachusetts, the Petitioner is allowed to make certain requests they wish to have the Court grant. These requests include granting divorce, child custody, child support and alimony, etc.
+  
+  While these requests will not be granted solely by reason of you wanting the Court to grant them, it is important to answer all of the questions which follow.
+fields:
+  - "Grant Divorce on the Grounds of Irretrievable Breakdown": users[0].grant_divorce
+    input type: dropdown
+    choices:
+      - Yes
+      - No
+  - "Grant Custody of Minor Children of Marriage": users[0].custody_children_number
+    datatype: dropdown
+    choices:
+      - Yes
+      - No
+  - "Restraining Order Prevention Against Spouse": users[0].restraining_order_prevention
+    input type: dropdown
+    choices:
+      - Yes
+      - No
+  - "Receive Alimony from Your Spouse": users[0].grant_alimony
+    input type: dropdown
+    choices:
+      - Yes
+      - No
+  - "Receive Child Support from Your Spouse": users[0].grant_child_support
+    input type: dropdown
+    choices:
+      - Yes
+      - No
+      - Unsure
+  - "Request the Court Grant Conveyance of Marital Property": users[0].grant_conveyance
+    input type: dropdown
+    choices:
+      - Yes
+      - No
+  - "Resume Former Name": users[0].grant_former_name
+    datatype: dropdown
+    choices:
+      - Yes: "Yes"
+      - No: "No"
+  - "Petitioner's Former Name": users[0].former_name
+    required: False
+    show if:
+      variable: users[0].grant_former_name
+      is: "Yes"
+---
+id: preview law2156_Final_Project
+question: |
+  Preview your form before you sign it
+subquestion: |
+  Here is a preview of the form you will sign on the next page.   
+  
+  ${ al_court_bundle.as_pdf(key='preview') }
+
+  Click the image to open it in a new tab. Click the "Edit answers" button
+  to edit your answers.
+
+  ${ action_button_html(url_action('review_law2156_Final_Project'), label='Edit answers', color='info') }
+  
+  Remember to come back to this window to continue and sign your form.
+continue button field: law2156_Final_Project_preview_question    
+---
+code: |
+  signature_fields = []
+---
+code: |
+  # This is a placeholder for the addresses that will be searched
+  # for matching address to court. Edit if court venue is based on 
+  # a different address than the user's
+  [user.address.address for user in users.complete_elements()]
+  addresses_to_search = [user.address for user in users.complete_elements()]
+---
+id: law2156 Final Project review screen
+event: review_law2156_Final_Project
+question: |
+  Review your answers
+review:
+  - Edit: other_parties.revisit
+    button: |
+      **Other parties**
+
+      % for item in other_parties:
+        * ${ item }
+      % endfor
+  - Edit: users.revisit
+    button: |
+      **Users**
+
+      % for item in users:
+        * ${ item }
+      % endfor
+  - Edit: rental_property_yes_no_unsure
+    button: |
+      **Rental Property**:
+      ${ rental_property_yes_no_unsure }
+  - Edit: date
+    button: |
+      **Today's Date**:
+      ${ date }
+  - Edit: user_public_assistance
+    button: |
+      **Public Assistance**:
+      ${ user_public_assistance }
+  - Edit: marital_real_property_yes_no_unsure
+    button: |
+      **Real Estate or Real Property**:
+      ${ marital_real_property_yes_no_unsure }
+  - Edit: spousal_joint_accounts_yes_no_unsure
+    button: |
+      **Joint Bank Accounts**:
+      ${ spousal_joint_accounts_yes_no_unsure }
+---
+continue button field: other_parties.revisit
+question: |
+  Edit other_parties
+subquestion: |
+  ${ other_parties.table }
+
+  ${ other_parties.add_action() }
+---
+table: other_parties.table
+rows: other_parties
+columns:
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+  - Address: |
+      row_item.address.block() if defined("row_item.address.address") else ""
+  - Employement status: |
+      row_item.employement_status if defined("row_item.employement_status") else ""
+  - Self employed or business owner: |
+      row_item.self_employed_or_business_owner if defined("row_item.self_employed_or_business_owner") else ""
+  - Custody children number: |
+      row_item.custody_children_number if defined("row_item.custody_children_number") else ""
+  - Previous marriage number: |
+      row_item.previous_marriage_number if defined("row_item.previous_marriage_number") else ""
+edit:
+  - name.first
+  - address.address
+  - employement_status
+  - self_employed_or_business_owner
+  - custody_children_number
+  - previous_marriage_number
+confirm: True
+
+---
+continue button field: users.revisit
+question: |
+  Edit users
+subquestion: |
+  ${ users.table }
+
+  ${ users.add_action() }
+---
+table: users.table
+rows: users
+columns:
+  - Custody of children: |
+      row_item.custody_of_children if defined("row_item.custody_of_children") else ""
+  - Previous marriage number: |
+      row_item.previous_marriage_number if defined("row_item.previous_marriage_number") else ""
+  - No fault a or b divorce: |
+      row_item.no_fault_a_or_b_divorce if defined("row_item.no_fault_a_or_b_divorce") else ""
+  - Part time job: |
+      row_item.part_time_job if defined("row_item.part_time_job") else ""
+  - Breakdown date: |
+      row_item.breakdown_date if defined("row_item.breakdown_date") else ""
+  - Rental income: |
+      row_item.rental_income if defined("row_item.rental_income") else ""
+  - Grant alimony: |
+      row_item.grant_alimony if defined("row_item.grant_alimony") else ""
+  - Name: |
+      row_item.name.full() if defined("row_item.name.first") else ""
+  - Date of marriage: |
+      row_item.date_of_marriage if defined("row_item.date_of_marriage") else ""
+  - Grant divorce: |
+      row_item.grant_divorce if defined("row_item.grant_divorce") else ""
+  - Restraining order prevention: |
+      row_item.restraining_order_prevention if defined("row_item.restraining_order_prevention") else ""
+  - Income child support: |
+      row_item.income_child_support if defined("row_item.income_child_support") else ""
+  - Motor vehicles yes no: |
+      row_item.motor_vehicles_yes_no if defined("row_item.motor_vehicles_yes_no") else ""
+  - Date last lived: |
+      row_item.date_last_lived if defined("row_item.date_last_lived") else ""
+  - Former name: |
+      row_item.former_name if defined("row_item.former_name") else ""
+  - Place of marriage: |
+      row_item.place_of_marriage if defined("row_item.place_of_marriage.address.address") else ""
+  - Income alimony: |
+      row_item.income_alimony if defined("row_item.income_alimony") else ""
+  - Grant former name: |
+      row_item.grant_former_name if defined("row_item.grant_former_name") else ""
+  - Self employed or business owner: |
+      row_item.self_employed_or_business_owner if defined("row_item.self_employed_or_business_owner") else ""
+  - Employment status: |
+      row_item.employment_status if defined("row_item.employment_status") else ""
+  - Custody children number: |
+      row_item.custody_children_number if defined("row_item.custody_children_number") else ""
+  - Affidavit: |
+      row_item.affidavit if defined("row_item.affidavit") else ""
+  - Number of children of marriage: |
+      row_item.number_of_children_of_marriage if defined("row_item.number_of_children_of_marriage") else ""
+  - Gross annual income: |
+      row_item.gross_annual_income if defined("row_item.gross_annual_income") else ""
+  - Real property yes no unsure: |
+      row_item.real_property_yes_no_unsure if defined("row_item.real_property_yes_no_unsure") else ""
+  - Mortgage: |
+      row_item.mortgage if defined("row_item.mortgage") else ""
+  - Place last lived: |
+      row_item.place_last_lived if defined("row_item.place_last_lived.address.address") else ""
+  - Fault divorce grounds: |
+      row_item.fault_divorce_grounds if defined("row_item.fault_divorce_grounds") else ""
+  - Grant child support: |
+      row_item.grant_child_support if defined("row_item.grant_child_support") else ""
+  - Address: |
+      row_item.address.block() if defined("row_item.address.address") else ""
+  - Separation agreement: |
+      row_item.separation_agreement if defined("row_item.separation_agreement") else ""
+  - Financial form: |
+      row_item.financial_form if defined("row_item.financial_form") else ""
+  - Grant conveyance: |
+      row_item.grant_conveyance if defined("row_item.grant_conveyance") else ""
+edit:
+  - custody_of_children
+  - previous_marriage_number
+  - no_fault_a_or_b_divorce
+  - part_time_job
+  - breakdown_date
+  - rental_income
+  - grant_alimony
+  - name.first
+  - date_of_marriage
+  - grant_divorce
+  - restraining_order_prevention
+  - income_child_support
+  - motor_vehicles_yes_no
+  - date_last_lived
+  - former_name
+  - place_of_marriage.address.address
+  - income_alimony
+  - grant_former_name
+  - self_employed_or_business_owner
+  - employment_status
+  - custody_children_number
+  - affidavit
+  - number_of_children_of_marriage
+  - gross_annual_income
+  - real_property_yes_no_unsure
+  - mortgage
+  - place_last_lived.address.address
+  - fault_divorce_grounds
+  - grant_child_support
+  - address.address
+  - separation_agreement
+  - financial_form
+  - grant_conveyance
+confirm: True
+
+---
+id: download law2156_Final_Project
+event: law2156_Final_Project_download
+question: |
+  All done
+subquestion: |
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
+
+  ${ action_button_html(url_action('review_law2156_Final_Project'), label='Edit answers', color='info') }
+  
+  
+  ${ al_user_bundle.download_list_html() }
+  
+
+  ${ al_user_bundle.send_button_html(show_editable_checkbox=True) }
+
+progress: 100
+---
+# ALDocument objects specify the metadata for each template
+objects:
+  - law2156_Final_Project_Post_interview_instructions: ALDocument.using(title="Instructions", filename="law2156_Final_Project_next_steps.docx", enabled=True, has_addendum=False)
+  - law2156_Final_Project_attachment: ALDocument.using(title="Law2156 Final Project", filename="law2156_Final_Project", enabled=True, has_addendum=False, )
+---
+# Bundles group the ALDocuments into separate downloads, such as for court and for the user
+objects:
+  - al_user_bundle: ALDocumentBundle.using(elements=[law2156_Final_Project_Post_interview_instructions, law2156_Final_Project_attachment], filename="law2156_Final_Project", title="All forms to download for your records", enabled=True)
+  - al_court_bundle: ALDocumentBundle.using(elements=[law2156_Final_Project_attachment],  filename="law2156_Final_Project", title="All forms to deliver to court", enabled=True)
+---
+# Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
+# used for "preview" and "final" keys, and logic in the template checks the value of 
+# `i` to show or hide the user's signature
+attachment:
+  name: Post-interview-Instructions
+  filename: law2156_Final_Project_next_steps
+  docx template file: law2156_Final_Project_next_steps.docx
+  variable name: law2156_Final_Project_Post_interview_instructions[i]
+  skip undefined: True
+---
+attachment:
+  name: law2156 Final Project
+  filename: law2156_Final_Project
+  variable name: law2156_Final_Project_attachment[i]
+  skip undefined: True
+  docx template file: law2156_Final_Project.docx
+
+
